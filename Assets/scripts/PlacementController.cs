@@ -3,9 +3,11 @@ using System.Collections;
 
 public class PlacementController : MonoBehaviour
 {
-    private GameObject obj;
     public GameObject grid;
     public float gridSize = 2f;
+    public string building;
+
+    private GameObject obj;
 
     // Use this for initialization
     void Start ()
@@ -16,7 +18,7 @@ public class PlacementController : MonoBehaviour
     void OnMouseDown()
     {
         Debug.Log("OnMouseDown");
-        obj = Instantiate(Resources.Load("short_building")) as GameObject;
+        obj = Instantiate(Resources.Load(building)) as GameObject;
         Vector3 pos = GetMousePositionOnPlane();
         obj.transform.position = SnapToGrid(pos);
     }
@@ -33,6 +35,7 @@ public class PlacementController : MonoBehaviour
         Debug.Log("OnMouseUp");
         Vector3 pos = GetMousePositionOnPlane();
         obj.transform.position = SnapToGrid(pos);
+        obj.GetComponent<BuildingConstruction>().StartBuilding();
         obj = null;
     }
 
@@ -72,7 +75,7 @@ public class PlacementController : MonoBehaviour
         gridPosition.z = Mathf.Min ( 0.5f * GridSize.z, Mathf.Max (-0.5f * GridSize.z, gridPosition.z) );
 
         Position = grid.transform.TransformPoint( gridPosition );
-        Position.y = 0.5f;
+        Position.y = 0.0f;
         // Debug.Log(Position);
         return Position;
     }
