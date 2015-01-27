@@ -5,19 +5,23 @@ using System.Collections;
 public class BuildingConstruction : MonoBehaviour {
 
     public float buildTime = 2.0f;
+    public bool complete = false;
     private float elapsedTime = 0.0f;
     private float completionPercent = 0.0f;
+
     private bool startBuilding = false;
-    private GameObject stub;
-    private GameObject complete;
+
+    private GameObject stubBuilding;
+    private GameObject completeBuilding;
 
 
     // Use this for initialization
     void Awake ()
     {
-        stub = gameObject.transform.FindChild("stub").gameObject;
-        complete = gameObject.transform.FindChild("complete").gameObject;
-        stub.SetActive(true);
+        stubBuilding = gameObject.transform.FindChild("stub").gameObject;
+        completeBuilding = gameObject.transform.FindChild("complete").gameObject;
+        stubBuilding.SetActive(!complete);
+        completeBuilding.SetActive(complete);
     }
 
     // Update is called once per frame
@@ -36,12 +40,13 @@ public class BuildingConstruction : MonoBehaviour {
 
     public void StartBuilding()
     {
-        startBuilding = true;
+        startBuilding = !complete;
     }
 
     public void FinishBuilding()
     {
-        stub.SetActive(false);
-        complete.SetActive(true);
+        stubBuilding.SetActive(false);
+        completeBuilding.SetActive(true);
+        complete = true;
     }
 }
