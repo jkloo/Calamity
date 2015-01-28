@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using RTS;
 
 public class WorldObject : MonoBehaviour
 {
@@ -67,5 +68,15 @@ public class WorldObject : MonoBehaviour
             controller.SelectedObject.SetSelection(false);
         controller.SelectedObject = worldObject;
         worldObject.SetSelection(true);
+    }
+
+    public virtual void SetHoverState(GameObject hoverObject)
+    {
+        //only handle input if owned by a human player and currently selected
+        if(player && player.human && currentlySelected)
+        {
+            if(hoverObject.name != "Ground")
+                player.hud.SetCursorState(CursorState.Select);
+        }
     }
 }

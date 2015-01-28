@@ -41,14 +41,14 @@ public class UserInput : MonoBehaviour {
 
         //make sure movement is in the direction the camera is pointing
         //but ignore the vertical tilt of the camera to get sensible scrolling
-        movement = Camera.mainCamera.transform.TransformDirection(movement);
+        movement = Camera.main.transform.TransformDirection(movement);
         movement.y = 0;
 
         //away from ground movement
         movement.y -= ResourceManager.ScrollSpeed * Input.GetAxis("Mouse ScrollWheel");
 
         //calculate desired camera position based on received input
-        Vector3 origin = Camera.mainCamera.transform.position;
+        Vector3 origin = Camera.main.transform.position;
         Vector3 destination = origin;
         destination.x += movement.x;
         destination.y += movement.y;
@@ -63,12 +63,12 @@ public class UserInput : MonoBehaviour {
 
         //if a change in position is detected perform the necessary update
         if(destination != origin) {
-            Camera.mainCamera.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.ScrollSpeed);
+            Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.ScrollSpeed);
         }
     }
 
     private void RotateCamera() {
-        Vector3 origin = Camera.mainCamera.transform.eulerAngles;
+        Vector3 origin = Camera.main.transform.eulerAngles;
         Vector3 destination = origin;
 
         //detect rotation amount if ALT is being held and the Right mouse button is down
@@ -79,7 +79,7 @@ public class UserInput : MonoBehaviour {
 
         //if a change in position is detected perform the necessary update
         if(destination != origin) {
-            Camera.mainCamera.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.RotateSpeed);
+            Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.RotateSpeed);
         }
     }
 
@@ -135,6 +135,30 @@ public class UserInput : MonoBehaviour {
         if(!Input.GetKey(KeyCode.LeftAlt) && player.SelectedObject) {
             player.SelectedObject.SetSelection(false);
             player.SelectedObject = null;
+        }
+    }
+
+    private void MouseHover()
+    {
+        if(player.hud.MouseInBounds())
+        {
+            GameObject hoverObject = FindHitObject();
+            if(hoverObject)
+            {
+                if(player.SelectedObject)
+                    player.SelectedObject.SetHoverState(hoverObject);
+                else if(hoverObject.name != "Ground")
+                {
+                    Player owner = hoverObject.transform.root.GetComponent< Player >();
+                    if(owner)
+                    {
+                        Unit unit = hoverObject.transform.parent.GetComponent< Unit >();
+                        Building building = hoverObject.transform.parent.GetComponent< Building >();
+                        if(owner.username == player.username && (unit || building))
+                            player.hud.SetCursorState(CursorState.Select);
+                    }
+                }
+            }
         }
     }
 }
