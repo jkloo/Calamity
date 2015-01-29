@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using RTS;
 
@@ -6,16 +7,18 @@ public class WorldObject : MonoBehaviour
 {
 
     public string objectName;
-    public Texture2D buildImage;
+    public Sprite buildImage;
     public int cost, sellValue, hitPoints, maxHitPoints;
 
     protected Player player;
     protected string[] actions = {};
     protected bool currentlySelected = false;
+    protected Bounds selectionBounds;
 
     protected virtual void Awake()
     {
-
+        selectionBounds = ResourceManager.InvalidBounds;
+        CalculateBounds();
     }
 
     protected virtual void Start ()
@@ -78,5 +81,26 @@ public class WorldObject : MonoBehaviour
             if(hoverObject.name != "Ground")
                 player.hud.SetCursorState(CursorState.Select);
         }
+    }
+
+    public void CalculateBounds()
+    {
+       selectionBounds = new Bounds(transform.position, Vector3.zero);
+        foreach(Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            selectionBounds.Encapsulate(r.bounds);
+        }
+    }
+
+    public bool IsOwnedBy(Player owner)
+    {
+        if(player && player.Equals(owner))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

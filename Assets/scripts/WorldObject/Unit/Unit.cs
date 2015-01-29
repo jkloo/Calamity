@@ -72,6 +72,7 @@ public class Unit : WorldObject {
             rotating = false;
             moving = true;
         }
+        CalculateBounds();
     }
 
     private void MakeMove()
@@ -79,6 +80,7 @@ public class Unit : WorldObject {
         transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * moveSpeed);
         if(transform.position == destination)
             moving = false;
+        CalculateBounds();
     }
 
     public override void SetHoverState(GameObject hoverObject)

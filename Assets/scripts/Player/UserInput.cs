@@ -7,7 +7,8 @@ public class UserInput : MonoBehaviour {
     private Player player;
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
         player = transform.root.GetComponent< Player >();
     }
 
