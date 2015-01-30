@@ -8,7 +8,12 @@ public class WorldObject : MonoBehaviour
 
     public string objectName;
     public Sprite buildImage;
-    public int cost, sellValue, hitPoints, maxHitPoints;
+    public int foodCost;
+    public int woodCost;
+    public int foodSellValue;
+    public int woodSellValue;
+    public int hitPoints;
+    public int maxHitPoints;
 
     protected Player player;
     protected string[] actions = {};
@@ -31,12 +36,7 @@ public class WorldObject : MonoBehaviour
 
     }
 
-    protected virtual void OnGUI()
-    {
-
-    }
-
-    public void SetSelection(bool selected)
+    public virtual void SetSelection(bool selected)
     {
         currentlySelected = selected;
     }
@@ -102,5 +102,20 @@ public class WorldObject : MonoBehaviour
         {
             return false;
         }
+    }
+
+    public void Sell()
+    {
+        if(player)
+        {
+            player.AddResource(ResourceType.Food, foodSellValue);
+            player.AddResource(ResourceType.Wood, woodSellValue);
+        }
+
+        if(currentlySelected)
+        {
+            SetSelection(false);
+        }
+        Destroy(this.gameObject);
     }
 }

@@ -31,11 +31,6 @@ public class Unit : WorldObject {
             MakeMove();
     }
 
-    protected override void OnGUI()
-    {
-        base.OnGUI();
-    }
-
     public override void MouseClick(GameObject hitObject, Vector3 hitPoint, Player controller)
     {
         base.MouseClick(hitObject, hitPoint, controller);

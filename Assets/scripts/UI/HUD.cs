@@ -8,16 +8,19 @@ public class HUD : MonoBehaviour
 {
 
     public Texture2D activeCursor;
-    public Texture2D defaultCursor, selectCursor, moveCursor, attackCursor, harvestCursor;
+    public Texture2D defaultCursor, selectCursor, moveCursor, attackCursor, harvestCursor, rallyPointCursor;
+    public Texture2D rallyPointImage;
     public Texture2D foodResourceIcon, woodResourceIcon;
     public Text foodResourceLabel, woodResourceLabel;
     private Player player;
 
-    private CursorState cursorState;
+    private CursorState activeCursorState;
     private Dictionary<CursorState, Texture2D> cursorMap;
     private Dictionary<ResourceType, int> resourceValues, resourceLimits;
 
     public Image[] actionButtons;
+    public Image sellButton;
+    public Image rallyButton;
 
     public Slider buildProgressSlider;
     public Image[] buildQueueImages;
@@ -25,6 +28,8 @@ public class HUD : MonoBehaviour
     public Slider healthSlider;
     private WorldObject lastSelection;
     private float sliderValue;
+
+    private CursorState previousCursorState;
 
     void Start()
     {
@@ -36,7 +41,8 @@ public class HUD : MonoBehaviour
             {CursorState.Select, selectCursor},
             {CursorState.Move, moveCursor},
             {CursorState.Attack, attackCursor},
-            {CursorState.Harvest, harvestCursor}
+            {CursorState.Harvest, harvestCursor},
+            {CursorState.RallyPoint, rallyPointCursor}
         };
         resourceValues = new Dictionary< ResourceType, int >();
         resourceLimits = new Dictionary< ResourceType, int >();
@@ -46,7 +52,6 @@ public class HUD : MonoBehaviour
 
     void Update ()
     {
-
         ClearBuildQueue();
         if(player && player.SelectedObject && player.SelectedObject.IsOwnedBy(player))
         {
@@ -62,6 +67,7 @@ public class HUD : MonoBehaviour
             if(selectedBuilding)
             {
                 DrawBuildQueue(selectedBuilding.getBuildQueueValues(), selectedBuilding.getBuildPercentage());
+                DrawStandardBuildingOptions(selectedBuilding);
             }
         }
         DrawHealthBar();
@@ -73,8 +79,12 @@ public class HUD : MonoBehaviour
         return true;
     }
 
-    public void SetCursorState(CursorState newState) {
-        cursorState = newState;
+    public void SetCursorState(CursorState newState)
+    {
+        Debug.Log("Cursor state: " + newState);
+        if(activeCursorState != newState)
+            previousCursorState = activeCursorState;
+        activeCursorState = newState;
         switch(newState) {
         case CursorState.Default:
             activeCursor = defaultCursor;
@@ -91,10 +101,18 @@ public class HUD : MonoBehaviour
         case CursorState.Move:
             activeCursor = moveCursor;
             break;
+        case CursorState.RallyPoint:
+            activeCursor = rallyPointCursor;
+            break;
         default:
             break;
         }
-        Cursor.SetCursor(cursorMap[cursorState], Vector2.zero, CursorMode.Auto);
+        Cursor.SetCursor(cursorMap[activeCursorState], Vector2.zero, CursorMode.Auto);
+    }
+
+    public void SetCursorStateRallyPoint()
+    {
+        SetCursorState(CursorState.RallyPoint);
     }
 
     public void SetResourceValues(Dictionary<ResourceType, int> resourceValues, Dictionary<ResourceType, int> resourceLimits)
@@ -113,6 +131,10 @@ public class HUD : MonoBehaviour
         }
         for(int i = 0; i < actions.Length && i < actionButtons.Length; i++)
         {
+            if(actions[i] == "")
+            {
+                continue;
+            }
             Sprite actionIcon = ResourceManager.GetBuildImage(actions[i]);
             actionButtons[i].enabled = true;
             actionButtons[i].sprite = actionIcon;
@@ -160,4 +182,24 @@ public class HUD : MonoBehaviour
         player.SelectedObject.PerformAction(player.SelectedObject.GetActions()[index]);
     }
 
+    private void DrawStandardBuildingOptions(Building building)
+    {
+        rallyButton.enabled = true;
+        sellButton.enabled = true;
+    }
+
+    public CursorState GetPreviousCursorState()
+    {
+        return previousCursorState;
+    }
+
+    public CursorState GetCursorState()
+    {
+        return activeCursorState;
+    }
+
+    public void SellSelectedObject()
+    {
+        player.SelectedObject.Sell();
+    }
 }
